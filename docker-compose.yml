@@ -1,0 +1,26 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      - DOMAIN=https://pass.cloud-corp.uz
+      - WEBSOCKET_ENABLED=true
+      - SIGNUPS_ALLOWED=false
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+    volumes:
+      - ./vw-data:/data
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy-data:/data
+      - ./caddy-config:/config
+    depends_on:
+      - vaultwarden
